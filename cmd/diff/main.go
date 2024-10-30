@@ -1,4 +1,4 @@
-package diff
+package main
 
 import (
 	ga "github.com/sethvargo/go-githubactions"
@@ -8,7 +8,6 @@ import (
 )
 
 func run() error {
-	// ctx := context.Background()
 	action := ga.New()
 
 	cfg, err := config.ConfigFromAction(action)
