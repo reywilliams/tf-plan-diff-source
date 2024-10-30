@@ -2,6 +2,7 @@ package summary
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
 	"tf-plan-diff/config"
@@ -23,9 +24,12 @@ func Run(cfg *config.Config) error {
 }
 
 func writeSummary(cfg *config.Config, actionGroups *map[interface{}][]*tfjson.ResourceChange) {
-
 	writeAppName(cfg)
+
+	fmt.Println("```diff")
 	writeSummaryByAction(actionGroups)
+	fmt.Println("```")
+
 	writeFooter(actionGroups)
 }
 
@@ -47,14 +51,35 @@ func writeSummaryByAction(actionGroups *map[interface{}][]*tfjson.ResourceChange
 }
 
 func writeFooter(actionGroups *map[interface{}][]*tfjson.ResourceChange) {
-	fmt.Println("footer")
+	actions := []interface{}{tfjson.ActionNoop, tfjson.ActionRead, tfjson.ActionCreate, tfjson.ActionDelete, tfjson.ActionUpdate, parse.ActionRecreate}
+
+	verbStrings := []string{}
+
+	for _, action := range actions {
+
+		actionVerb := strings.ToUpper(resolveVerb(action, false))
+		numChanges := len((*actionGroups)[action])
+		changeCount := strconv.Itoa(numChanges)
+
+		if numChanges == 0 {
+			continue
+		}
+
+		verbStrings = append(verbStrings, strings.Join([]string{actionVerb, changeCount}, " "))
+	}
+
+	verbString := strings.Join(verbStrings, ", ")
+
+	footerString := strings.Join([]string{"This plan will:", verbString}, " ")
+
+	fmt.Println(footerString)
 }
 
 func transLateToMarkDown(action interface{}, resourceChange *tfjson.ResourceChange) string {
 
 	diffMarker := resolveDiffMarker(action)
 	address := resourceChange.Address
-	actionVerb := resolveVerb(action)
+	actionVerb := resolveVerb(action, true)
 
 	return strings.Join([]string{diffMarker, address, "will be", actionVerb}, " ")
 }
@@ -82,21 +107,37 @@ func resolveDiffMarker(action interface{}) string {
 	return ""
 }
 
-func resolveVerb(action interface{}) string {
+func resolveVerb(action interface{}, pastTense bool) string {
 	switch action := action.(type) {
 	case tfjson.Action:
 		switch action {
 		case tfjson.ActionDelete:
-			return "deleted"
+			if pastTense {
+				return "deleted"
+			} else {
+				return "delete"
+			}
 		case tfjson.ActionCreate:
-			return "created"
+			if pastTense {
+				return "created"
+			} else {
+				return "create"
+			}
 		case tfjson.ActionUpdate:
-			return "updated in place"
+			if pastTense {
+				return "updated"
+			} else {
+				return "update"
+			}
 		}
 	case parse.Action:
 		switch action {
 		case parse.ActionRecreate:
-			return "recreated"
+			if pastTense {
+				return "recreated"
+			} else {
+				return "recreate"
+			}
 		}
 	default:
 		return ""
