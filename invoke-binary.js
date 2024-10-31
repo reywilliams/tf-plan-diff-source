@@ -1,5 +1,5 @@
 /**
- * Javascript shim inspired by from Blend:
+ * Javascript shim inspired by Blend:
  * https://full-stack.blend.com/how-we-write-github-actions-in-go/invoke-binary.js
  */
 
