@@ -37,4 +37,23 @@ jobs:
         run: |
           cp ./invoke-binary.js ./action-repo/
           cp ./action.yaml ./action-repo/
-          cp -r ./binaries/* ./action-repo
+          cp -r ./binaries/* ./action-repo/
+
+      - name: Set up Git
+        working-directory: action-repo
+        run: |
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Commit changes
+        working-directory: action-repo
+        run: |
+          git add .
+          git commit -m "update action w/ binaries via workflow 🚀"
+
+      - name: Push changes
+        working-directory: action-repo
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+        run: |
+          git push origin main
