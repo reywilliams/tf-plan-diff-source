@@ -71,7 +71,7 @@ func writeFooter(actionGroups *map[interface{}][]*tfjson.ResourceChange, action 
 	for _, action := range actions {
 
 		actionVerb := strings.ToUpper(resolveVerb(action, false))
-		actionVerb = strings.Join([]string{"*", actionVerb, "*"}, "") // make verb bold
+		actionVerb = strings.Join([]string{"**", actionVerb, "**"}, "") // make verb bold
 		numChanges := len((*actionGroups)[action])
 		changeCount := strconv.Itoa(numChanges)
 
