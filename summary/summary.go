@@ -94,7 +94,12 @@ func resolveDiffMarker(action interface{}) string {
 			return "+"
 		case tfjson.ActionUpdate:
 			return "!"
+		case tfjson.ActionNoop:
+			return "#"
+		case tfjson.ActionRead:
+			return "#"
 		}
+
 	case parse.Action:
 		switch action {
 		case parse.ActionRecreate:
