@@ -36,9 +36,9 @@ jobs:
 
       - name: Copy Action Files
         run: |
-          cp ./invoke-binary.js ./action-repo/
-          cp ./action.yaml ./action-repo/
-          cp -r ./binaries/* ./action-repo/
+          cp -v ./invoke-binary.js ./action-repo/
+          cp -v ./action.yaml ./action-repo/
+          cp -v -r ./binaries/* ./action-repo/
 
       - name: Set up Git
         working-directory: action-repo
@@ -49,6 +49,10 @@ jobs:
       - name: Commit changes
         working-directory: action-repo
         run: |
+          # remove old binaries
+          rm -v action-*
+
+          # add new files
           git add .
           git commit -m "update action w/ binaries via workflow 🚀"
 
