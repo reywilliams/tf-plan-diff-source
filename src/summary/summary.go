@@ -28,9 +28,9 @@ func writeSummary(cfg *config.Config, actionGroups *map[interface{}][]*tfjson.Re
 
 	if len(*actionGroups) == 0 {
 		if cfg.AppName != "" {
-			action.AddStepSummary(fmt.Sprintf("%s Plan Contains No Pertinent Actions :green_circle:", cfg.AppName))
+			action.AddStepSummary(fmt.Sprintf("# `%s` Plan Contains No Pertinent Actions :green_circle:", cfg.AppName))
 		} else {
-			action.AddStepSummary("Plan Contains No Pertinent Actions :green_circle:")
+			action.AddStepSummary("# Plan Contains No Pertinent Actions :green_circle:")
 		}
 		return
 	}
@@ -46,9 +46,9 @@ func writeSummary(cfg *config.Config, actionGroups *map[interface{}][]*tfjson.Re
 
 func writeAppName(cfg *config.Config, action *ga.Action) {
 	if cfg.AppName != "" {
-		action.AddStepSummary(fmt.Sprintf("# %s Plan Diff :build_construction:", cfg.AppName))
+		action.AddStepSummary(fmt.Sprintf("# `%s` Plan Diff :building_construction:", cfg.AppName))
 	} else {
-		action.AddStepSummary("# Plan Diff :build_construction:")
+		action.AddStepSummary("# Plan Diff :building_construction:")
 	}
 }
 
@@ -71,6 +71,7 @@ func writeFooter(actionGroups *map[interface{}][]*tfjson.ResourceChange, action 
 	for _, action := range actions {
 
 		actionVerb := strings.ToUpper(resolveVerb(action, false))
+		actionVerb = strings.Join([]string{"*", actionVerb, "*"}, "") // make verb bold
 		numChanges := len((*actionGroups)[action])
 		changeCount := strconv.Itoa(numChanges)
 
@@ -83,7 +84,7 @@ func writeFooter(actionGroups *map[interface{}][]*tfjson.ResourceChange, action 
 
 	verbString := strings.Join(verbStrings, ", ")
 
-	footerString := strings.Join([]string{"This plan will:", verbString}, " ")
+	footerString := strings.Join([]string{":warning:", "This plan will:", verbString, ":warning:"}, " ")
 
 	action.AddStepSummary(footerString)
 }
