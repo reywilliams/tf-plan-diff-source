@@ -38,6 +38,11 @@ jobs:
         run: |
           cp -v ./invoke-binary.js ./action-repo/
           cp -v ./action.yaml ./action-repo/
+
+          # remove old binaries
+          rm -v ./action-repo/action-*
+
+          # add new binaries
           cp -v -r ./binaries/* ./action-repo/
 
       - name: Set up Git
@@ -49,9 +54,6 @@ jobs:
       - name: Commit changes
         working-directory: action-repo
         run: |
-          # remove old binaries
-          rm -v action-*
-
           # add new files
           git add .
           git commit -m "update action w/ binaries via workflow 🚀"
