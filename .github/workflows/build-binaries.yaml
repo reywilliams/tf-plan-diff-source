@@ -39,6 +39,7 @@ jobs:
         run: |
           cp -v ./invoke-binary.js ./action-repo/
           cp -v ./action.yaml ./action-repo/
+          cp -v ./readme.md ./action-repo/
 
           # remove old binaries
           rm -v -f ./action-repo/action-*
