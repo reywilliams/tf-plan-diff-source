@@ -40,7 +40,7 @@ jobs:
           cp -v ./action.yaml ./action-repo/
 
           # remove old binaries
-          rm -v ./action-repo/action-*
+          rm -v -f ./action-repo/action-*
 
           # add new binaries
           cp -v -r ./binaries/* ./action-repo/
