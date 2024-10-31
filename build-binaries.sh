@@ -26,7 +26,7 @@ for platform in "${platforms[@]}"; do
   CGO_ENABLED=0 GOOS=$OS GOARCH=$ARCH go build \
     -ldflags="-s -w" \
     -trimpath \
-    -o ./binaries/action-$OS-$ARCH-$VERSION_SHA \
+    -o ../binaries/action-$OS-$ARCH-$VERSION_SHA \
     ./cmd/diff
 done
 
