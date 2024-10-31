@@ -13,7 +13,7 @@ import (
 
 func Run(cfg *config.Config) error {
 
-	actionGroups, err := parse.Parse(cfg.FilePath)
+	actionGroups, err := parse.Parse(cfg)
 	if err != nil {
 		return fmt.Errorf("could not parse file at %s: %v", cfg.FilePath, err)
 	}
@@ -24,6 +24,16 @@ func Run(cfg *config.Config) error {
 }
 
 func writeSummary(cfg *config.Config, actionGroups *map[interface{}][]*tfjson.ResourceChange) {
+
+	if len(*actionGroups) == 0 {
+		if cfg.AppName != "" {
+			fmt.Printf("%s Plan Contains No Pertinent Actions :green_circle:", cfg.AppName)
+		} else {
+			fmt.Printf("Plan Contains No Pertinent Actions :green_circle:")
+		}
+		return
+	}
+
 	writeAppName(cfg)
 
 	fmt.Println("```diff")
@@ -35,7 +45,9 @@ func writeSummary(cfg *config.Config, actionGroups *map[interface{}][]*tfjson.Re
 
 func writeAppName(cfg *config.Config) {
 	if cfg.AppName != "" {
-		fmt.Printf("# %s Plan Diff\n", cfg.AppName)
+		fmt.Printf("# %s Plan Diff :build_construction:\n", cfg.AppName)
+	} else {
+		fmt.Printf("# Plan Diff :build_construction:\n", cfg.AppName)
 	}
 }
 
