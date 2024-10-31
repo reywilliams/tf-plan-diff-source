@@ -3,6 +3,7 @@ package parse
 import (
 	"fmt"
 	"os"
+	"tf-plan-diff/config"
 
 	gw "github.com/gruntwork-io/terratest/modules/terraform"
 	tfjson "github.com/hashicorp/terraform-json"
@@ -14,14 +15,14 @@ const (
 	ActionRecreate Action = "recreate"
 )
 
-func Parse(filePath string) (*map[interface{}][]*tfjson.ResourceChange, error) {
+func Parse(cfg *config.Config) (*map[interface{}][]*tfjson.ResourceChange, error) {
 
-	planStruct, err := getPlanStruct(filePath)
+	planStruct, err := getPlanStruct(cfg.FilePath)
 	if err != nil {
-		return nil, fmt.Errorf("could not get plan struct from file path %s: %v", filePath, err)
+		return nil, fmt.Errorf("could not get plan struct from file path %s: %v", cfg.FilePath, err)
 	}
 
-	return groupByAction(planStruct.ResourceChangesMap), nil
+	return groupByAction(cfg, planStruct.ResourceChangesMap), nil
 }
 
 func getPlanStruct(filePath string) (*gw.PlanStruct, error) {
@@ -48,7 +49,7 @@ func planJsonToString(filePath string) (string, error) {
 	return string(fileBytes), nil
 }
 
-func groupByAction(resourceChangesMap map[string]*tfjson.ResourceChange) *map[interface{}][]*tfjson.ResourceChange {
+func groupByAction(cfg *config.Config, resourceChangesMap map[string]*tfjson.ResourceChange) *map[interface{}][]*tfjson.ResourceChange {
 
 	actionGroups := make(map[interface{}][]*tfjson.ResourceChange)
 
@@ -60,8 +61,10 @@ func groupByAction(resourceChangesMap map[string]*tfjson.ResourceChange) *map[in
 			actionGroups[tfjson.ActionDelete] = append(actionGroups[tfjson.ActionDelete], resource)
 		} else if action.Update() {
 			actionGroups[tfjson.ActionUpdate] = append(actionGroups[tfjson.ActionUpdate], resource)
-		} else if action.Read() {
+		} else if action.Read() && cfg.IncludeReadActions {
 			actionGroups[tfjson.ActionRead] = append(actionGroups[tfjson.ActionRead], resource)
+		} else if action.NoOp() && cfg.IncludeNoOpActions {
+			actionGroups[tfjson.ActionNoop] = append(actionGroups[tfjson.ActionNoop], resource)
 		} else if action.Replace() {
 			actionGroups[ActionRecreate] = append(actionGroups[ActionRecreate], resource)
 		}
