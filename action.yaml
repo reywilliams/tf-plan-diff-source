@@ -1,5 +1,20 @@
 name: tf-plan-diff
 description: A Simple Terraform Plan Diff In Your Job Summary
+
+inputs:
+  file_path:
+    description: "Path to the JSON plan file (ex. tfplan.json)"
+    required: true
+  app_name:
+    description: "Name of your application (ex. Test App)"
+    required: false
+  include_noop: 
+    description: "Flag to include no-op actions (any value will eval to true)"
+    required: false
+  include_read: 
+    description: "Flag to include read actions (any value will eval to true)"
+    required: false
+
 runs:
   using: node20
   main: invoke-binary.js
