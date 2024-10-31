@@ -14,7 +14,7 @@ jobs:
       - name: Inject Version SHA into Invoke File
         run: |
           echo "using SHA: ${{ github.sha }}"
-          sed -i 's|__API_URL__|${{ github.sha }} |' ./invoke-binary.js
+          sed -i 's|__VERSION_SHA__|${{ github.sha }}|' ./invoke-binary.js
 
       - name: Install Go
         uses: actions/setup-go@v5
