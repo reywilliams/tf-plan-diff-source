@@ -9,60 +9,61 @@ import (
 	"tf-plan-diff/parse"
 
 	tfjson "github.com/hashicorp/terraform-json"
+	ga "github.com/sethvargo/go-githubactions"
 )
 
-func Run(cfg *config.Config) error {
+func Run(cfg *config.Config, action *ga.Action) error {
 
 	actionGroups, err := parse.Parse(cfg)
 	if err != nil {
 		return fmt.Errorf("could not parse file at %s: %v", cfg.FilePath, err)
 	}
 
-	writeSummary(cfg, actionGroups)
+	writeSummary(cfg, actionGroups, action)
 
 	return nil
 }
 
-func writeSummary(cfg *config.Config, actionGroups *map[interface{}][]*tfjson.ResourceChange) {
+func writeSummary(cfg *config.Config, actionGroups *map[interface{}][]*tfjson.ResourceChange, action *ga.Action) {
 
 	if len(*actionGroups) == 0 {
 		if cfg.AppName != "" {
-			fmt.Printf("%s Plan Contains No Pertinent Actions :green_circle:", cfg.AppName)
+			action.AddStepSummary(fmt.Sprintf("%s Plan Contains No Pertinent Actions :green_circle:", cfg.AppName))
 		} else {
-			fmt.Printf("Plan Contains No Pertinent Actions :green_circle:")
+			action.AddStepSummary("Plan Contains No Pertinent Actions :green_circle:")
 		}
 		return
 	}
 
-	writeAppName(cfg)
+	writeAppName(cfg, action)
 
-	fmt.Println("```diff")
-	writeSummaryByAction(actionGroups)
-	fmt.Println("```")
+	action.AddStepSummary("```diff")
+	writeSummaryByAction(actionGroups, action)
+	action.AddStepSummary("```")
 
-	writeFooter(actionGroups)
+	writeFooter(actionGroups, action)
 }
 
-func writeAppName(cfg *config.Config) {
+func writeAppName(cfg *config.Config, action *ga.Action) {
 	if cfg.AppName != "" {
-		fmt.Printf("# %s Plan Diff :build_construction:\n", cfg.AppName)
+		action.AddStepSummary(fmt.Sprintf("# %s Plan Diff :build_construction:", cfg.AppName))
 	} else {
-		fmt.Printf("# Plan Diff :build_construction:\n", cfg.AppName)
+		action.AddStepSummary("# Plan Diff :build_construction:")
 	}
 }
 
-func writeSummaryByAction(actionGroups *map[interface{}][]*tfjson.ResourceChange) {
+func writeSummaryByAction(actionGroups *map[interface{}][]*tfjson.ResourceChange, ghAction *ga.Action) {
 	actions := []interface{}{tfjson.ActionNoop, tfjson.ActionRead, tfjson.ActionCreate, tfjson.ActionDelete, tfjson.ActionUpdate, parse.ActionRecreate}
 
 	for _, action := range actions {
 		for _, change := range (*actionGroups)[action] {
-			fmt.Println(transLateToMarkDown(action, change))
+			ghAction.AddStepSummary(transLateToMarkDown(action, change))
 		}
 	}
 
 }
 
-func writeFooter(actionGroups *map[interface{}][]*tfjson.ResourceChange) {
+func writeFooter(actionGroups *map[interface{}][]*tfjson.ResourceChange, action *ga.Action) {
 	actions := []interface{}{tfjson.ActionNoop, tfjson.ActionRead, tfjson.ActionCreate, tfjson.ActionDelete, tfjson.ActionUpdate, parse.ActionRecreate}
 
 	verbStrings := []string{}
@@ -84,7 +85,7 @@ func writeFooter(actionGroups *map[interface{}][]*tfjson.ResourceChange) {
 
 	footerString := strings.Join([]string{"This plan will:", verbString}, " ")
 
-	fmt.Println(footerString)
+	action.AddStepSummary(footerString)
 }
 
 func transLateToMarkDown(action interface{}, resourceChange *tfjson.ResourceChange) string {

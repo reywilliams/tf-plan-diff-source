@@ -15,7 +15,7 @@ func run() error {
 		return err
 	}
 
-	return summary.Run(cfg)
+	return summary.Run(cfg, action)
 }
 
 func main() {
