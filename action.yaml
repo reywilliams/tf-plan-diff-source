@@ -1,0 +1,5 @@
+name: tf-plan-diff
+description: A Simple Terraform Plan Diff In Your Job Summary
+runs:
+  using: node20
+  main: invoke-binary.js

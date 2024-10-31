@@ -1,0 +1,40 @@
+name: build-binaries
+run-name: build binaries for ref ${{ github.ref_name }}
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-binaries:
+    name: Build Binaries
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Inject Version SHA into Invoke File
+        run: |
+          echo "using SHA: ${{ github.sha }}"
+          sed -i 's|__API_URL__|${{ github.sha }} |' ./invoke-binary.js
+
+      - name: Install Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.23"
+
+      - name: Run Shell Script
+        run: |
+          chmod +x ./build-binaries.sh
+          ./build-binaries.sh ${{ github.sha }}
+
+      - name: Checkout Action Repo
+        uses: actions/checkout@v4
+        with:
+          repository: reywilliams/tf-plan-diff
+          token: ${{ secrets.GH_PAT }}
+          path: action-repo
+
+      - name: Copy Action Files
+        run: |
+          cp ./invoke-binary.js ./action-repo/
+          cp ./action.yaml ./action-repo/
+          cp -r ./binaries/* ./action-repo
