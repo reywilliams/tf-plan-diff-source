@@ -65,7 +65,7 @@ jobs:
 
 ## 🔒 Data Privacy
 
-This action **does not** transmit any data from your Terraform plan. It is designed as a parser that leverages HashiCorp's own [structs](https://pkg.go.dev/github.com/hashicorp/terraform-json@v0.13.0) for parsing Terraform plans. Your plan data remains local to your GitHub Actions environment, ensuring that your infrastructure details are kept private and secure - source code repo coming shortly!
+This action **does not** transmit any data from your Terraform plan. It is designed as a parser that leverages HashiCorp's own [structs](https://pkg.go.dev/github.com/hashicorp/terraform-json@v0.13.0) for parsing Terraform plans. Your plan data remains local to your GitHub Actions environment, ensuring that your infrastructure details are kept private and secure - source code repo can be found [here](https://github.com/reywilliams/tf-plan-diff-source/tree/main/src).
 
 ## 📦 Installation
 
