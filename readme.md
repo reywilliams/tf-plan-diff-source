@@ -77,4 +77,4 @@ If you have ideas, improvements, or bug fixes, feel free to open an issue!
 
 ## 🌟 License
 
-This project is licensed under the MIT [License](./LICENSE) - see the LICENSE file for details.
+This project is licensed under the Apache License 2.0 [License](./LICENSE) - see the LICENSE file for details.
